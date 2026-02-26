@@ -18,7 +18,7 @@ const Info = ({ sendIngredientList }) => {   //() 안에 {} "" props 로
     const id = Date.now();
     // 재료 1개
     const newItem = {
-      id:{id},
+      id,
       label:`ingredient-${id}`,
       text:"재료명",
       value:""
@@ -44,6 +44,9 @@ const Info = ({ sendIngredientList }) => {   //() 안에 {} "" props 로
 
   }
   const handleNext = () => {
+    // 미션 : 입력된 재료가 1개도 없는 경우 코드 실행 막기
+    if(ingredientList.length < 1) return;
+
     sendIngredientList(ingredientList);
     // console.log("chat페이지로 이동");
     history("/chat");
@@ -63,9 +66,9 @@ const Info = ({ sendIngredientList }) => {   //() 안에 {} "" props 로
   // }, [])
 
   // 3. 특정 state가 변경이 일어났을때 실행
-  useEffect(() => {
-    console.log("ingredientList",ingredientList);
-  }, [ingredientList])
+  // useEffect(() => {
+  //   console.log("ingredientList",ingredientList);
+  // }, [ingredientList])
 
   // view
   return (

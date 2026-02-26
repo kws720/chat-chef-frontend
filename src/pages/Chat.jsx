@@ -1,16 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MessageBox from "../components/MessageBox";
 import PrevButton from "../components/PrevButton";
 import { MoonLoader } from "react-spinners";
 
-const Chat = () => {
+const Chat = ({ingredientList}) => {
   // logic
-
+  const endpoint = process.env.REACT_APP_SERVER_ADDRESS;  //.env 파일 내 변수 담기
+  
   const [value, setValue] = useState("");
 
   // TODO: set함수 추가하기
-  const [messages] = useState([]); // chatGPT와 사용자의 대화 메시지 배열
-  const [isInfoLoading] = useState(false); // 최초 정보 요청시 로딩
+  const [messages, setMessages] = useState([]); // chatGPT와 사용자의 대화 메시지 배열
+
+  const [infoMessages, setInfoMessages] = useState([]) // 초기세팅 메시지
+
+  const [isInfoLoading, setIsInfoLoading] = useState(true); // 최초 정보 요청시 로딩
   const [isMessageLoading] = useState(true); // 사용자와 메시지 주고 받을때 로딩
   const hadleChange = (event) => {
     const { value } = event.target;
@@ -22,6 +26,44 @@ const Chat = () => {
     event.preventDefault();
     console.log("메시지 보내기");
   };
+
+  const sendInfo = async () => {
+    setIsInfoLoading(true);
+    try {
+      // 초기세팅 api 호출
+      const response = await fetch(`${endpoint}/recipe`, {    //async 함수에서 api를 통해서 데이터를 받아와야 하는경우 await 문법을 통해 데이터 받은 후 처리되도록 함.
+        method : "POST",
+        headers : {"Content-Type":"application/json"},
+        body : JSON.stringify({ ingredientList })
+      });
+
+      // 응답 데이터를 자바스크립트 객체로 변환
+      const result = await response.json();
+      console.log("🚀 ~ sendInfo ~ result:", result)
+
+      // 데이터가 잘 들어온 경우에만 실행 (데이터가 제대로 들어오지 않은 경우 종료)
+      if(!result.data) return;
+      
+      // 초기 2개 메시지 저장
+      const removeLastMessageList = result.data.filter((_,index, arr) => index !== arr.length - 1);
+
+      setInfoMessages(removeLastMessageList);
+
+      // 마지막 대화는 메시지박스에 저장
+      const { role, content } = result.data[result.data.length-1];
+      setMessages((prev) => [...prev,{role, content}]);
+    } catch (error) {
+      console.error("🚀 ~ sendInfo ~ error:", error)
+    } finally{
+      setIsInfoLoading(false);
+    } 
+  }
+
+  useEffect(() => {
+    // console.log("🚀 ~ Chat ~ ingredientList:", ingredientList);
+    sendInfo();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
 
   // view
   return (
@@ -35,7 +77,7 @@ const Chat = () => {
       )}
 
       {/* START: 로딩 스피너 */}
-      {/* START:뒤로가기 버튼 */}
+      {/* START:뒤로가기 버튼 */} 
       <PrevButton />
       {/* END:뒤로가기 버튼 */}
       <div className="h-full flex flex-col">
