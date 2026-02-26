@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 
-const InfoInput = ({ content , onChange }) => {
+const InfoInput = ({ content , onChange, onDelete }) => {
   // logic
-  const { label, text } = content;    //구조분해 Info.jsx 에서 받아온 데이터(id,labe,text,value)
+  const { id, label, text } = content;    //구조분해 Info.jsx 에서 받아온 데이터(id,labe,text,value)
 
   const [value,setValue] = useState("");
 
@@ -19,6 +19,8 @@ const InfoInput = ({ content , onChange }) => {
 
   const onRemove = () => {
     console.log("재료 삭제하기");
+    onDelete(id);
+
   };
 
   // view

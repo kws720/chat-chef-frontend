@@ -5,7 +5,7 @@ import AddButton from "../components/AddButton";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 
-const Info = () => {
+const Info = ({ sendIngredientList }) => {   //() 안에 {} "" props 로 
   // logic
   const history = useNavigate();
 
@@ -27,17 +27,24 @@ const Info = () => {
     setIngredientList( (prev)=> [...prev, newItem]);
   };
 
-  const handlechange = (data)  => {
+  const handleChange = (data)  => {
   
-    console.log("🚀 ~ handlechange ~ data:", data);
+    console.log("🚀 ~ handleChange ~ data:", data);
 
     //받아온 value값으로 재료 목록 업데이트
     setIngredientList((prev) => prev.map((item) => item.id === data.id ? data : item ))
 
     // console.log("🚀 ~ Info ~ ingredientList:", ingredientList);
   }
+  
+  const handleDelete = (selectedId)  => {
+     
+    const filteredList = ingredientList.filter((item) => item.id !== selectedId )
+    setIngredientList(filteredList);
 
+  }
   const handleNext = () => {
+    sendIngredientList(ingredientList);
     // console.log("chat페이지로 이동");
     history("/chat");
   };
@@ -55,10 +62,10 @@ const Info = () => {
   //   console.log("✅최초 1회 실행되었습니다.");
   // }, [])
 
-  // // 3. 특정 state가 변경이 일어났을때 실행
-  // useEffect(() => {
-  //   console.log("ingredientList",ingredientList);
-  // }, [ingredientList])
+  // 3. 특정 state가 변경이 일어났을때 실행
+  useEffect(() => {
+    console.log("ingredientList",ingredientList);
+  }, [ingredientList])
 
   // view
   return (
@@ -82,7 +89,12 @@ const Info = () => {
             {/* START:input 영역 */}
             <div>
               {ingredientList.map((item) => ( //map : ingredientList 배열 갯수만큼 InfoInput 컴포넌트 추가
-                <InfoInput key={item.id} content={item} onChange={handlechange}/>
+                <InfoInput 
+                  key={item.id}
+                  content={item}
+                  onChange={handleChange}
+                  onDelete={handleDelete}
+                />
               ))}
             </div>
             {/* END:input 영역 */}
