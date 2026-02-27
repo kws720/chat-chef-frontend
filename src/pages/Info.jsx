@@ -45,7 +45,28 @@ const Info = ({ sendIngredientList }) => {   //() 안에 {} "" props 로
   }
   const handleNext = () => {
     // 미션 : 입력된 재료가 1개도 없는 경우 코드 실행 막기
+    // if(ingredientList.length < 1) return;
+
+    // let cnt=0;
+    // for(let i=0;i<ingredientList.length;i++){
+    //   if(ingredientList[i].value.trim !== ""){
+    //     cnt++;
+    //   }
+    // }
+    // if(cnt === 0){  
+    //   alert("재료입력이 안되었습니다\n재료 입력을 해주세요!");
+    //   return;
+    // }
+
+    //----------------위에는 내가 한거 ---------------------
+
+
     if(ingredientList.length < 1) return;
+
+    const filteredList = ingredientList.filter((item) => item.value.trim());
+
+    if(filteredList.length < 1) return;
+    //----------------위에는 강사님이 한거--------------------
 
     sendIngredientList(ingredientList);
     // console.log("chat페이지로 이동");

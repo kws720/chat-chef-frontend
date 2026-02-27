@@ -15,16 +15,52 @@ const Chat = ({ingredientList}) => {
   const [infoMessages, setInfoMessages] = useState([]) // 초기세팅 메시지
 
   const [isInfoLoading, setIsInfoLoading] = useState(true); // 최초 정보 요청시 로딩
-  const [isMessageLoading] = useState(true); // 사용자와 메시지 주고 받을때 로딩
+  const [isMessageLoading, setIsMessageLoading] = useState(false); // 사용자와 메시지 주고 받을때 로딩
   const hadleChange = (event) => {
     const { value } = event.target;
     console.log("value==>", value);
     setValue(value);
   };
 
+  const sendMessage = async (userMessage) => {
+    
+    //2. AI메시지 로딩바 보여주기
+    setIsMessageLoading(true);
+    
+    // 메시지 API 요청
+    try {
+      const response = await fetch(`${endpoint}/message`, {
+        method: "POST",
+        headers : {"Content-Type" : "application/json"},
+        body : JSON.stringify({userMessage,messages:[...infoMessages,...messages]})
+      })
+
+      const result = await response.json();
+      console.log("🚀 ~ sendMessage ~ result:", result.data);
+    
+      //4. 답변UI 업데이트
+      setMessages((prev) => [...prev, { role:"assistant", content:result.data.content }]);
+    }catch(error){
+      console.error("🚀 ~ hadleSubmit ~ error:", error)
+    }finally{
+      // 로딩스피너 off
+      setIsMessageLoading(false);
+    }
+  }
+
   const hadleSubmit = (event) => {
     event.preventDefault();
-    console.log("메시지 보내기");
+    const userMessage = { role:"user", content: value.trim() };
+    //console.log("메시지 보내기");
+    //1. 사용자 메시지 UI업데이트  
+    setMessages((prev) => [...prev,userMessage]);
+
+    //3. 메시지 API 요청
+    sendMessage(userMessage);
+
+    //5. 사용자 input 초기화
+    setValue("");
+    
   };
 
   const sendInfo = async () => {
